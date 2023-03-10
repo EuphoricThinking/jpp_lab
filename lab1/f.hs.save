@@ -1,0 +1,30 @@
+incAll :: [[Int]] -> [[Int]]
+incAll [] = []
+incAll (x : xs) = f x : incAll xs where
+  f [] = []
+  f (y : ys) = (y + 1) : f ys
+
+iA :: [[Int]] -> [[Int]]
+iA [] = []
+iA (x : xs) = (map (+1) x) : iA xs
+
+iA' :: [[Int]] -> [[Int]]
+iA' xs :: map (\ys -> map (+1) ys) xs
+
+iA'' :: [[Int]] -> [[Int]]
+iA'' xs :: map (map (+1)) xs  -- częściowa aplikacja funkcji
+
+iA''' :: [[Int]] -> [[Int]]
+iA''' = map (map (+1)) xs
+-- map $ map (+1) -- częściowa aplikacja map
+
+--foldl :: (b->a->b) -> b -> [a] -> b
+{--
+wielokrotnie aplikują funkcję
+wartość początkową ustal
+--}
+
+silnia n = foldr (*) 1 [2..n]
+
+conca
+
