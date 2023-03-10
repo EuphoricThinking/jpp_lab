@@ -15,7 +15,7 @@ iA'' :: [[Int]] -> [[Int]]
 iA'' xs :: map (map (+1)) xs  -- częściowa aplikacja funkcji
 
 iA''' :: [[Int]] -> [[Int]]
-iA''' = map (map (+1)) xs
+iA''' = map (map (+1)) --xs
 -- map $ map (+1) -- częściowa aplikacja map
 
 --foldl :: (b->a->b) -> b -> [a] -> b

@@ -41,3 +41,22 @@ wydajniejsza niż klasyczna rekursja ogonowa - nie trzeba obawiać się
 --showInt :: Int -> String
 --showInt a = interact "xd"
 -- (chr a) : ""
+
+incAll :: [[Int]] -> [[Int]]
+--incAll [[]] = [[]]
+--incAll xs = [map (\x -> x + 1) y | y <- xs]
+--incAll xs = map (map (\x -> x + 1)) xs
+incAll = map (map (+1))
+
+-- silnia n = foldr (*) n [1..(n-1)]
+silnia n = foldr (*) 1 [2..n]
+
+suma n = foldr (+) 0 [1..n]
+
+concat' :: [[a]] -> [a]
+concat' [] = []
+concat' n = foldr (++) [] n
+
+nub :: [a] -> [a]
+nub [] = []
+nub (x:xs) = x:nub $ filter (\a -> a /= x) xs
