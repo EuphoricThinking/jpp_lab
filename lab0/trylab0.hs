@@ -57,3 +57,18 @@ concat' [x, y] = x++concat' [y]
 inits:: [a] -> [[a]]
 inits [] = [[]]
 inits (x:xs) = []:[x:ys | ys <- inits xs]
+
+partitions :: [a] -> [([a], [a])]
+partitions n =
+  let
+    pref = inits n
+    suff = reverse $ map reverse $ inits $ reverse n
+  in
+    zip pref suff
+
+-- part :: [a] -> [([a], [a])]
+-- part [] = [[], []]
+
+nub :: (Eq a) => [a] -> [a]
+nub [] = []
+nub (x:xs) = x:[y | y <- nub xs, y /= x]
