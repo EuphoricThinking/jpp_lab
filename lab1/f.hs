@@ -83,3 +83,20 @@ silnian n = go n 1 where
 
 -- reverse' (x:xs) reverse' xs ++ [x]  // niewdajne
 -- reverse' [] = []
+
+reverse'' :: [a] -> [a]
+-- reverse'' [] = []
+reverse'' xs = go xs [] where
+  go [] ys = ys
+  go (y : ys) zs = go ys (y:zs)
+
+fibo :: (Integral a) => a -> a
+fibo 0 = 0
+fibo 1 = 1
+fibo n = fibo (n-1) + fibo (n-2)
+
+-- rekursja ogonowa
+fibo' n = go 0 1 n where
+  go x _ 0 = x
+  go _ x 1 = x
+  go x y n = go y (x + y) $ n - 1
