@@ -55,6 +55,5 @@ concat' [x] = x
 concat' [x, y] = x++concat' [y]
 
 inits:: [a] -> [[a]]
-inits [] = []
---inits a = [a]
-inits (xs:x) = inits(xs) ++ [(xs:x)]
+inits [] = [[]]
+inits (x:xs) = []:[x:ys | ys <- inits xs]

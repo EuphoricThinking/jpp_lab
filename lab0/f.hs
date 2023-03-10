@@ -95,6 +95,17 @@ inits (x : xs) = []:[ (x : ys) | ys <- inits xs] -- pierwsza próba
 -- alternative = [] : (map (x :) (inits xs))
 
 {--
+l = [1,2,3]
+init [1,2,3]
+init [2, 3]
+init [3]
+init [] -> [[]]
+        -> init 3:[] = [] : [3]         	-> [[], [3]]
+        -> init 2:3  = [] : [[], [3]]   	-> [[], [2], [2, 3]]
+        -> init 1:23 = [] : [[], [2], [2,3]]	-> [[], [1], [1, 2], [1, 2, 3]]
+--}
+
+{--
 odwrócić listę, wziąć prefiksry odwrócenia, odwrócić ponownie
 --}
 
@@ -107,6 +118,17 @@ partitions xs =
 -- będzie potrzebe reverse na początku
   in zip prefixes suffixes
 
+{--
+xs = [1,2,3]
+reverse xs [3, 2, 1]
+inits [3, 2, 1] = [[], [3], [3, 2], [3, 2, 1]]
+map reverse = [[], [3], [2, 3], [3, 2, 1]]
+	zip [[], [1], [1, 2], [1, 2, 3]] [[], [3], [2, 3], [3, 2, 1]]:
+		[[], []], [[1], [3]], [[1,2], [2, 3]] ...
+reverse = [[3, 2, 1], [2, 3], [3], []]
+	zip [[3, 2, 1], [2, 3], [3], []] [[], [1], [1, 2], [1, 2, 3]]
+		[[3, 2, 1], []], [[2, 3], [1]] // zamień kolejność podanych list, zacznij od inits
+--}
 
 {--
 prościej: schemat z inits
