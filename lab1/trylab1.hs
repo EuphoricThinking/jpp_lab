@@ -86,10 +86,30 @@ triads n
                      (x*x) + (y*y) == (z*z),
                      x <= y, y <= z]
 
-{--
+
 triads' :: Int -> [(Int, Int, Int)]
 triads' n
   | n <=0 = []
-  | otherwise = go [1..n] where
-      go [] = []
+  | otherwise =
+      let
+--        go [] = []
+--        go (x:xs) = x:[go $ filter (\p -> p `mod` x /= 0) xs]
+--        ns = 1 : (go [2..n]) where
+        go :: [(Int, Int, Int)] -> [(Int, Int, Int)]
+        go [] = []
+        go (x:xs) = x:(go $ filter (\p -> p `mod` x /= 0) xs)
+        ns = 1: go([2..n])
+      in
+--          [(x,x,x) | x <- ns]
+        [(x,y,z) | x <- ns, y <- ns, z <- ns,
+                   (x*x) + (y*y) == (z*z),
+                   x <= y, y <= z]
+
+{--
+sieve :: [Int] -> [Int]
+sieve [] = []
+sieve (x:y:xs)
+  | y == [] = [x]
+  | xs == [] = [x:y]
+  | otherwise = x:(sieve $ filter (\p -> p `mod` x /= 0) xs)
 --}
