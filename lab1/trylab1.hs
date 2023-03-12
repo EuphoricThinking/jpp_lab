@@ -57,6 +57,39 @@ concat' :: [[a]] -> [a]
 concat' [] = []
 concat' n = foldr (++) [] n
 
-nub :: [a] -> [a]
+nub :: (Eq a) => [a] -> [a]
 nub [] = []
-nub (x:xs) = x:nub $ filter (\a -> a /= x) xs
+nub (x:xs) = x : nub ( filter (\y -> y /= x) xs)
+
+scalar :: [Int]->[Int]->Int
+scalar [] _ = 0
+scalar _ [] = 0
+scalar xs ys = foldr (+) 0 $ zipWith (*) xs ys
+
+
+triples :: Int -> [(Int, Int, Int)]
+triples n
+  | n <= 0 = []
+  | otherwise =
+      let
+        ns = [1..n]
+      in [(x, y, z) | x <- ns, y <- ns, z <- ns]
+
+triads :: Int -> [(Int, Int, Int)]
+triads n
+  | n <= 0 = []
+  | otherwise =
+      let
+        ns = [1..n]
+      in
+        [(x, y, z) | x <-ns, y <- ns, z<- ns,
+                     (x*x) + (y*y) == (z*z),
+                     x <= y, y <= z]
+
+{--
+triads' :: Int -> [(Int, Int, Int)]
+triads' n
+  | n <=0 = []
+  | otherwise = go [1..n] where
+      go [] = []
+--}
