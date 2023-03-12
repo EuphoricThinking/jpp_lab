@@ -97,11 +97,12 @@ triads' n
 --        ns = 1 : (go [2..n]) where
         go :: [(Int, Int, Int)] -> [(Int, Int, Int)]
         go [] = []
-        go (x:xs) = x:(go $ filter (\p -> p `mod` x /= 0) xs)
-        ns = 1: go([2..n])
+        go ((e, f, g):xs) = (e,f,g):(go $ filter (\(a, b, c) -> not (a `mod` e == 0 && b `mod` f == 0 && c `mod` g == 0)) xs)
+--        ns = 1: go([2..n])
+        ns = [1..n]
       in
 --          [(x,x,x) | x <- ns]
-        [(x,y,z) | x <- ns, y <- ns, z <- ns,
+        go [(x,y,z) | x <- ns, y <- ns, z <- ns,
                    (x*x) + (y*y) == (z*z),
                    x <= y, y <= z]
 
