@@ -100,3 +100,7 @@ fibo' n = go 0 1 n where
   go x _ 0 = x
   go _ x 1 = x
   go x y n = go y (x + y) $ n - 1
+
+{--
+ósme niewiele wnosi, ale można rozwiązać samemu, żeby ,,poćwiczyć programowanie"
+--}

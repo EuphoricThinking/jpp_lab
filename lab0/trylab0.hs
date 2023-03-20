@@ -72,3 +72,91 @@ partitions n =
 nub :: (Eq a) => [a] -> [a]
 nub [] = []
 nub (x:xs) = x:[y | y <- nub xs, y /= x]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+part :: [a] -> [([a], [a])]
+part [] = [([], [])]
+part (x:xs) = ([], x:xs) : [(x:a, b) | (a, b) <- part xs]
+
+
+perm :: (Eq a) => [a]->[[a]]
+perm [] = [[]]
+perm xs = [x : ys | x <- xs, ys <- perm $ filter (/= x) xs]
+{--
+[([a], [a])]
+partitions [] -> [([], [])]
+x : xs
+(a, b) <- partitions xs
+el <- partitions xs
+(a, b) <- el
+
+[1,2,3]
+paritions x:xs
+1  23
+   2   3        ->
+       3 : []   -> [([], [])]  // ([3], []), ([], [3])
+
+23
+
+([], 23), ([2], [3]), (23, [])
+([], xs), (x:a, b), (x:c, d)
+--}
+
+{--
+123
+132
+312
+231
+213
+321
+
+123
+213
+
+231
+321
+
+132
+312
+
+perm :: [a] -> [a]
+perm [] = []
+
+-----> x: xs ---> perm xs  ----> []
+123
+
+3: [] ---> []
+----->[3]
+filter (/= x) xs
+perm [] = []
+perm (xs) = [x : perm $ filter (/=x) xs | x <- xs]
+
+
+2
+23 32
+--}
