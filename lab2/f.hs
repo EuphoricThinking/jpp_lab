@@ -1,3 +1,9 @@
+module f where
+
+import Data.Char(isDigit)
+
+import Prelude hiding(Either(..))
+
 {--
 DEFINIOWANIE TYPÓW I INSTANCJI - ZALICZENIOWE
 
@@ -285,3 +291,64 @@ simpl x = x
 simpl (EMul (EInt 1) x) = x
 
 -- do domu można punkt c oraz d
+-- d nie na zajęciach
+
+{-
+6 wartości liczb, tóre występująw dnahym napisie
+mamy di dyspozycji read - je sli istnieje instancja jklays read dla danego typu (wynik z :t read)
+read "15" nie kompilje, ponieważ kompilaotro ne wie, czego chcemy od read
+read "15" :: Int  // poprawne, jawnie deklarujemy możmey również dać :: Float
+
+:t all
+all / funckja okreslająca preydkta / lista
+words dzieli pospacjach
+-}
+
+
+readInts2 :: String Either String [Int]
+readInts2 :: go [] $ words s where
+  go ns  [] = Right $ reverse ns
+  go ns (w : ws)
+    | all isDigit w = go (read w : ns) ws
+    | otherwise = Left $ "Nie liczba" ++ w
+
+sumInts :: String -> String
+sumInts s =
+  case readInts2 s of
+    Left e -> e
+    Right ns -> show $ sum ns
+
+{-
+mapRight zamienimy na tekstowy zapis sumy tych liczb
+-}
+sumInts' :: String -> String
+sumInts' s = fromEither $ mapRight (show . sum) $ readInts2 s
+
+-- fmap (+5) (Just 10)
+
+{-
+instancej funktor - jednoargumentowe konstruktyr typu
+częściowa aplikacja konsrtuktora typu pdyz either
+-}
+
+
+-- wybiórczym importem wycięliśmy standardowy show
+data Either a b = Left a | Right b
+  deriving Show
+
+-- fmap length $ Left "ala"
+
+instance Functor (Either e) where
+-- fmap :: (a -> b) -> Either e a -> Either e b
+  fmap _ (Left e) = Left e
+  fmap f (Right x) = Right $ f x
+
+
+-- functor dla tree trywialne, do domu
+-- trzeba fmapem rozoznać, czy drzewo puste, czy niepuste (po fmap puste jest pustym)
+-- niepuste - fmap rekurencyjne lewe i praw,e, funckję aplikujemy w korzeniu
+
+reverseRight' :: Either e [a] -> Either e [a]
+reverseRight' x = fmap reverse x
+-- reverseRight' Right "blad" // Left "nblad"
+
