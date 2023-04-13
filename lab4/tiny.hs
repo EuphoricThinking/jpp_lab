@@ -79,7 +79,7 @@ execStmt p@(SWhile be s) = do
   state <- get
   let b = evalBool state be
   if b then (SNext s p) else return ()
-
+-- najpierw s, później pętla, zamiast return () może być SSkip, nawiasy może niepotrzebne
 {-
 next wykkonaj s1, następnie s2
 ddwa oblcizenia mozemy złżycć bindem
