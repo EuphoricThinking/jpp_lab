@@ -1,0 +1,171 @@
+frontend - rozpoznawanieu programu w jezyku xórdłowu
+- analiza leksykalna, składnioa i kontekstowa (semantyczna), 3 części
+
+scanner, lexer
+
+2 parser analizator składniowy
+3 analizatr kontekstowy, semantyczny
+
+3. część o
+wskazówka do 3. analizatora: dostaje na wejście drzewo struktury, przechodzi przez drzewo struktury, sprawdzając, czy warunki, które powinny być spełnione, są spełnione
+
+
+strumienń leksemóœ albo tkokenów jako yjście analizatorka leksykalenego
+lekser - niepodzielny ciąg znaków wystę[ujący w kodzie źródłwym, który reprezntuje byt języka, który ma znaczenie niezlaeńznie od pozostałych
+
+token - reprezentacja leksemu
+
+na zajęciach utożsamiamy tokeny i leksemy
+
+analizator leksykalnu otyzmuje kod xródłwy, generuje na wyjście strumień rtokenó
+strumień tokenów n we jsćie analizatora skłądniowego , który rozpoznaje składnię
+analizao skłądniowy na podstawie gramatyki tworozny
+tokemny utożsamia z symbolami terminalnymi gramatyki bezkontekstowej
+
+na wejściu ciąg terminali, analizator skłądniowy odpowiada, czy ciąg repzrezentuje słwoo należące do języka opisane za pomocą gramtyki bezkontekstowej
+
+analilizator powinien podać doóód, że słowo należy do jezyka  -dowodem jest wyprowadzenia słowa
+albo onuikat o błeðzie, albo wyprowazenie słowa jakko wynik
+drzeweo struktry zamiast zaywkłego wyporwadzenia - outpuj zazwyczaj
+skompresowana, uproszczona wersja drzewa wyprowadzenia
+drzewo wypraowdazenia: ciąg przekształcecń, od początkowego symbolu
+urposzczenie poprzez eliminację niepotrzebnych węzłów
+
+drzewo struktury na wejsćie analizatora semantycznego - komunika to błeðzie albo dekruje drzewo struktury dodatkowymi inormcjami
+
+leksykalny anazator - regularene elementy języka; automat skończony
+skladniowy - bezkontekstowe elementy skłądn języka; automat ze stosem
+
+analizator leksykanly - podczas pracy część analizy smenatycznej, by zdecydować, czy dany identyfiakktor jest nazwą typu czy nie
+(a)-b
+a odjąć b
+lub
+rzutowanie na typ a negacji wartości b
+
+analizator skłądniowy musi wiedzieć, czy to nazwa typu, czy nie
+leksykalny dowiaduje się o tym od semantycznego
+
+
+chcemy zachować przepływ informacji tylko w jednym kierunku - ułatwienie dla naszej pracy
+
+ll i lr
+jakie wyprowadzenie konstruujemy
+od lewej cytamy 
+drug alistera: lewostronee wyprowzdznie, zajmujemy sie skrajnie lewym nieternilanem w każdym kolejnym kroku
+
+ll zaczyanmy od symbolu początkowego gramatyki
+zastępujemy nieterminal prawą stroną produkcji
+lr odwrotnie
+knstruuje wyprowadzenie od końca, od wyprowadzonego słowa
+cofamy się w kolejnych krokach wyprowadzina aż do symbolu początkowego gramatyki
+redukuje wejscie aż do momentu, kiedy zreduuje wejście do symbolu początkowego gramtyki
+
+topdwon zstępujące LL
+bottom-up wstępujące LR zaczyan od dołu drzewa wyprowadzenia
+
+analizator składniowy ręcznie zazwyczaj przy LL
+metoda zejść rekurencyjnych
+dla każdego ineterminala oddziewlan aprocedurar analiztora skłądniowego, by rozpoznać, co zostało wyprowadzone
+w składdni rekursja - metoda zejść rekurenycjnych sami wymyślilibyśmy
+
+nie robimy ręcznie LR - tylko automatycznie
+
+ręcznie - LL
+LR - automatycznie wygenerowany
+
+BNFC - LR
+
+parsec - biblioteka zejść rekurencyjnych
+
+automatyczny analizator składniowy dla nas jest bez sensu - lepiej metodą zejść rekurencyjncych
+przy prostych językach
+jeżeli potrzebujmey płnej kontroli - LL
+Jeśli nie - LR automatycznie
+
+na przyszłość: sami definiujemy język, tak, żeby bezproblemowo analizator składniowy napisć
+w definicji języka możemy od razu napisać w taki sposób, by LR bez problemu poradziła sobie
+
+
+BNFC demonstracja
+
+EBNF tutaj
+Exp ::= "(" [Exp1] ") ;
+Exp1 ::= "@" ;
+Exp1 ::= Exp;
+
+dla BNFC trzeba każdą produkcję opatrzyć etykietą (LBNF)
+labeled - dla każdej produkcji wprowadzam etukietę
+
+M. Exp ::= "(" [Exp1] ") ;
+A. Exp1 ::= "@" ;
+_. Exp1 ::= Exp;
+
+separator Exp1 "" ;
+
+gdybdby M-> N, @ -> a
+nie można użyć litery dużego N, ponieważ identyfikator używany do czegoś innego
+nie moze być tokenu podobnego do indentyfikatora, ponieważ chce, żeby była identyfuikatorem
+
+bnfc -m nazwapliku.cf
+brak na ścieżce
+
+definicja typu, którego wartośćcią drzewo struktury (ywygenerowany plik)
+dwie produkcje,ettykietowne
+M jako konstruktor wartości
+
+x specdyfikacja skłądni leksykalnej dla alex
+
+plik y happy anaizator skłądniowy - dla niego specyfikacja
+
+alex i happy odpowiedniki fleksa i bizona/jaka
+szkilee kodu chodzącego po drzewiestrukutry
+testnanwiadone.hs uruchamia analizatorleksykalny, składniowy
+
+kiedy zmake'uję powstanie program testNawiasowe
+
+napiszemy gramatykę jezyka w naszym programie
+
+
+Exp ::= Integer (liczba całkowita)
+Exp ::= Ident (identyfikator reprezentacja)
+Exp := "(" "+" Exp Exp ")" ;
+
+Etykeity
+
+EInt. Exp ::= Integer (liczba całkowita)
+EVar. Exp ::= Ident (identyfikator reprezentacja)
+EAdd. Exp := "(" "+" Exp Exp ")" ;
+
+ZMAIST BNFC -m wstaw ścieżka_fdo_bnf -m nazwa_pliku.cf
+następnie make
+
+składnia prefiksowa z lispa
+infiksowo może być trudniej
+
+ESub. Exp ::= Exp "-" Exp
+EId.  Exp := Ident
+
+3 -2 -1 można na dwa spspoby, gramatyka niejednoznaczna
+chcemy wiąznie lewostronne, a wyszło w prawo
+3 - (2 - 1)
+shift/reduce OZNACZA, ŻE GRAMATYKA NIEJEDNOZNACZNA
+ZADANIEM ANALIZATORA SKŁADNOWEGO WSKZAZANIE JEDYNIE SŁUSZNYCHH WYPROWADZEŃ
+jeśli niejednoznaczna - błędna
+
+RADA: postarać się, by nie zgłaszały podobnych konfliktów
+
+Składnia obnawiasowana, jak w Lispie
+jeśli zapis infiksowy - konflikty
+
+wywowłaj ręcznie
+happy -i parMi.y plik ze specyfikacją
+-i generuje plik info, w kótrym znajduje się na początku, w kórym stnanie konfliikt wystąpił
+
+shift - przesuwanie kropki za minus
+nie wie, czy operator wiążący w lewo czy w prawo
+na korzyść SHIFT wybiera happy
+
+jednoznaczne: prawym argumentem odejmowania nie może byc wynik odejmowania
+Exp := exp "-" Exp1
+exp := Exp1
+exp1 := Integer
