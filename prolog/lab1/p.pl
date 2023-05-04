@@ -162,3 +162,138 @@ plus(s(s(s(0))), X, Y).
 plus(x, s(s(s(0)))), Y). nieskońćzenie wiele sukcesów; poprawne odpowiedzi, ale zapętlił się
 SLD drzewa dla wybranych zapytań powinny być skończone
 */
+
+/*
+Predykatów takich jak minus nie definiuje się
+*/
+% minus wtw gdy x-y=z
+minus(X,YX,X) :- plus(Y,Z,X).
+
+% fib(K, N) wtw, N to K-ta liczba Fibo
+% najpierw rekurencyjnie
+fib(0, 0).
+fib(s(0), s(0))
+fib(1, 1).
+fib(s(s(N)), F) :- 
+fib(s(N), F1), 
+% pierwszy argument nieustalony? będzie pętlić się
+fib(N, F2), 
+plus(F1, F2, F).
+
+% alt
+% deterministyczny ze względu na pirwszy argument w pierwszej wersji
+% wdrugiej wersji fibrec0 cośtam fibrec(s(0), cośtam uzgodnią się
+fibrec(N, F) :-
+minus(N, s(0), N1),
+minus(N1, s(0), N2),
+fibrec(N1, F1),
+fibrec(N2, F2),
+plus(F1, F2, F).
+
+% wersja rekurencyjna wcześniej, teraz iteracyjnie
+% pętla, w której przechodzimy po kolejnych parach wartości sąsiadującyhc w ciągu
+
+% akumulator, pomocnicza funkcja
+% predykat plus o arności 3? pełna nazwa predykatu
+% teraz ujrzymy, jak NIE programować
+/*
+predykat fibiter o arności 4
+*/
+fibiter(N, F) :-fibiter(N, 0, s(0), F).
+fibiter(0, A, _, A).
+% zmienną F ciągniemy za sobą
+% pierwszy argument ile wywołań reukrenycjych, dwa i trzy - dwie kolejne liczbyFibo
+% dwie zmienne, na których zapamiętujemy liczby
+% czwarty argument - zmienna, którą powinien uzgodnić z N-tą liczbą Fibonacciego
+% przekazujemy zmienną w głąb ciągu wywołań rekurenycnch
+% zmienną na czawartym uzgadniamy z drugim?
+% fibiter(+N, -F)
+fibiter(s(N), A, B, F) :- plus(A,B,C), fibiter(N, B, C, F).
+
+
+/*
+klauzule unarne nie wygenerują nieskończonej gałęzi
+jedynie niebezpieczeństwo w rekurencyjnej klauzuli
+
+fibiter i fibrec z nieustalonym pierwszym argumentem - nieskończone SLD drzewo - błąd, zapętlenie
+*/
+
+// prolog ma własną reprezentację list?
+// zdefiniuj predykat lista, jeśli L jest listą
+% co jest potrzeben do reprezentacji list? potrzebumey listy pustej i dokładania elemetów (const)
+nasza_lista(pusta)
+% _ zamiast X, by uniknąć ostrzeżeiń o singletpnoe
+%nasza_lista
+nasza_lista(para(_, L)) :- nasza_lista(L)
+
+
+% predykat element - tak, by działał na anszej reprezentacji listy
+% nie zaczynaj od predykatu porównującego z pustą listą, ponieważ nasz program powinien niczego wóœczas nie zwracać prawdziwego
+nasz_element(E, para(E, L)).
+nasz_element(E, para(_, L)) :- nasz_element(E, L).
+
+/*
+listy w progologu:
+[] pusta
+bez consa (cons jest ukryty?)
+% [10, 20] =.. L.
+% =.. predykat o=do spłaszcznani termu
+L = ['[|]', 10, [20]]
+/*
+=.. powoduje uzgodnienie prawego argumentu z listą, któ©ej pierwszym argumentem jest główny symbol funkcyjny
+2+3*4=..L.
+L = [+, 2, 3*4]
+=.. predykat unit
+
+sicstus '.' tak nazywa cons
+swi nazwało '[|]'
+ukrytwa kropkę, czyli: nie pozwala na jej zastosowanie
+w obu mplementacjach ten symbol jest ukryty
+aazwczyaj nie potrzebujemy cons, tylko stosujemy lukier syntaktyczny
+[10,20,30]=L.
+[10,20,30] = L, K = [50 | L]
+przed kreską pionową podajemy, co podajemy przed ogonem listy
+*/
+
+% prologowa lsta
+lista([]).
+lista([_ | L]) :- lista(L).
+% lista([10,20,30|40]) porażka, gdyż obcinamy elementy z poćżatu listy. Docieramy do 40, której nie mozemy z niczym dopasować
+
+/*
+lista(L).
+nieustalone elemnty
+L =[_1645] wygenerowana anonimowa zmienna
+element(X, [10,20,30])
+*/
+
+% pierwszy - weź klauzulę unarną predykatu element; E jest pierwszym argumentem consa, za pomocą ktrego została zbudowana
+pierwszy(E, [E | _]).
+
+% ostatni
+ostatni(E, [E]).
+ostatni(E, [_ | L]) :- ostatni(E, L).
+% dla ustalonego drugiego argumentu jest deterministycnzy, jednak z nagłowka klauzul to nie wynika,
+% ponieważ RÓWNIEŻ dla jednoelementowej listy - wówczas dla listy pustej jako L uruchmoimunie i nie zadziała
+% POPRAWNE:
+ostatni(E, [_, X | L]) :- ostatni(E, [X | L]).
+% nie można uzgodnić drugiego argumentu
+
+
+
+
+/*
+podziel(Lista, Nieparz, Parz).
+bierzemy dwa pierwsze elementy i dołączamy do elementów parzystych i nieparzystych
+*/
+podziel([], [], []).
+podziel([X], [], [X]). % jednoelementowa lista, numerujemy od zera
+% jak powinna wystąpić tutaj lista pusta?
+% błąd - myśleliśmy operacyjnie
+% długości listy nie zgadzają się - otrzymujemy dłuższą listę
+% x, y powinny być w nagłówku
+podziel([X, Y | L], N, P) :- podziel(L, [Y | N], [X | P]).
+
+% przenosimy do nagłówka
+% zgadza się suma długości list
+podziel([X, Y | L], [Y | N\, [X | P]) :- podziel(L, N, P).
