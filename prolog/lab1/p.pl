@@ -296,4 +296,66 @@ podziel([X, Y | L], N, P) :- podziel(L, [Y | N], [X | P]).
 
 % przenosimy do nagłówka
 % zgadza się suma długości list
+% jeśli którykolwiek argumetn ustalony - nie zapętli się, gdyż dotrzemy do listy pustej
 podziel([X, Y | L], [Y | N\, [X | P]) :- podziel(L, N, P).
+% podziel(L, [10, 20], K).
+
+% połączenie dwóch pierwszych klauzul w jedną
+% podziel(X,Y,Z) :- member((X,Y,Z), [([],[],[]), ([V], [], [V])]
+/*
+predykat scal
+L3 może być nieystalone
++ ustalone - nieustalone
++ + +
++ + -
+*/
+scal([], L, L). % scalamy tę samą
+scal([X | L], K, [X | M]) :- scal(L, K, M). % tutaj sprawdzamy, czy podane listy są scalone
+
+% element -> member
+% scal -> append
+% istnieje x, które należy do obu list
+% pierwszy predykat member - generator, drugi - tester
+% intersect(L1, L2) :- member(X, L1), member(X, L2).
+
+/*
+NOWE podziel
+*/
+podziel([], [], []). % druga okzała się być redundantna, generowała podwójne wyniki
+podziel([X|L], N, [X|P]) :- podziel(L, P, N).0
+
+
+prefiks(P, L) :- append(P, _, L).
+sufiks(S, L) :- append(_, S, L).
+
+% wycinek listy - spójny
+podlista(P, L) :- append(_, S, L), append(P, _, S).
+
+% niekoniecznie jeden po drugim - podciąg
+% podciag(P, L)
+podciag([], _).
+% ładniej zamiast powyższej podciag([], []) zablokujemy powtórki
+podciag([X|P], [X|L]) :- podciag(P, L).
+% jeśli nie występuje teraz na liście - musi występować dalej
+podciag(P, [_|L]) :- podciag(P, L).
+
+
+% insertion sort
+% pomocniczy predykat insert
+% zadana lista, zadany element - wstawia
+
+% lista K z listy L poprzez wstawienie X - posortowane
+% insert(L, X, K).
+insert([], X, [X]). % na koniec wstawiamy?
+insert([Y | L], X, [X, Y | L]) :- X =< Y.
+insert([Y | L], X, [Y | K]) :- X > Y, insert(L,X,K).
+
+% rekursja nieogonowa, napismy ogonową
+inesrtion_sort([], []).
+insertion_sort([X | L], S) :- insertion_sort(L, S0), insert(S0, X, S).
+
+% mniejsze równe z nieustaloną wartością - komunikat o błędzie
+% potrzebujmey dodatkowego predykatu w roli akumulatora
+insort(L, S) :- inosort(L, [], S).
+insort([], S, S).
+insort([X | L], A, S) :- insert(A, X, A1), insort(L, A1, S).
