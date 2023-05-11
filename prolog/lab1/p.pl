@@ -357,5 +357,186 @@ insertion_sort([X | L], S) :- insertion_sort(L, S0), insert(S0, X, S).
 % mniejsze równe z nieustaloną wartością - komunikat o błędzie
 % potrzebujmey dodatkowego predykatu w roli akumulatora
 insort(L, S) :- inosort(L, [], S).
+% S jest wynikiem scalenia wyniku sortowania listy pustej z S
 insort([], S, S).
+% prawa: jeśli S jest wynikiem posortowania listy S z A1, to S jest również wynikime scalenia
+% X | L z listą A
+% myśleć o kodzie jak o pętli, w której w kolejnych obrotach
 insort([X | L], A, S) :- insert(A, X, A1), insort(L, A1, S).
+
+
+% testując ozwiązanie, sprawdzamy wszystkie odpowiedzi - nie satysfakcjonuje nas, że pierwsza poprawna - wszystkie powinny być poprawne
+% jeśłi tylko jedna jest poprawna - powinien być jednokrotny sukces z daną odpowiedzią
+% bez większej liczby sukcesów w SLD drzewie
+
+% ostatnie zadanie ze scenariusza
+% predykat środek, nienaturalna kolejność argumentów, drugi argument (lista) ustalony
+
+% środokowy element z drugim argumentem uzgodnij
+% na siłę: policz długość listy L, upewnij się, że nieparzysta, podziel przez 2, wynik + 1 (nieparzysta) wyznacza pozycję środkową, szukamy elementu na środkowej pozycji
+% term o reprezentacji liczby bez sensu - wartośc liczby liczbą wystąpień?
+% liczenie wystąpień consa w liście reprezentującej liczbę
+% przyjmujemy na potrzeby zadania - lista reprezentacją, wartość reprezentowana to długość liczby
+% wówczas możemy posłużyć się listą L jako reprezeentacją jej wałasnej długości
+% lista sama swoją długość reprezentuje
+
+% Agata's idea in C: turtle and hare
+% co drugi element bierzemy do listy
+% element E bierzemy, by uzgodnić arguemnt
+% drugi i trzeci argument - dwa wskaźniki, za pomcą których przechodzimy po liście
+
+% środek(?E, +L)
+srodek(E, L) :- srodek(E, L, L).
+srodek(E, [E | _], [_]).
+% klauzula unarna: 
+% kiedy na trzecim argumencie mamy jeden element(nieparzysta długość, co drugi zabieramy) - środkowy element zostaje
+srodek(E, [_ | L1], [_, _ | L2]) :- srodek(E, L1, L2).
+% porównaj rozwiązanie prawa strona
+
+
+% X is 2*2
+% X is W* Y błąð drugi argument MUSI być ustalony. Mogą być zmienne, jednak nie mogą mieć nieustalonej wartości
+% is uzgadia wartość wyrażenia z praway arguemtem
+% liczy wartości praweog argumentu
+% 2+2 is 2*2 // lub 4 porażka; zwykłe uzgadnianie
+% 2+2 = 4 false, ponieważ po lewej mamy dodawanie dwóch liczb, a po prawej tylko czwórkę
+
+% ;iczy wartość prawego, uzgadnai z leweym
+% 4 is 2 + 2 true
+
+
+% porównywanie nie za pomocą =, tylko =:=
+% =:= liczy wartość obu wyrażeń, następnie próbuje uzgodnić wartości obu
+% =\= nie równa się
+
+% technika z akumultaorem - na początek bez akumulatora
+
+% suma(+L, ?S)
+% nieogonowo
+suma([], 0).
+% ważna kolejnośc- wpp. komunikat o błeðzie: niewystarczająco ustalone argumenty (S0 jeszcze nieustalone, gdyby zamienić po przecinku i przed przecinkiem
+suma([X | L], S) :- suma(L, S0), S is S0 + X. 
+
+% ogonowo
+suma(L, S) :- suma(L, 0, S).
+suma([], S, S).
+% A1 jako następnik A, nowy akumulator liczę, dodając do starego wartość X
+suma([X | L], A, S) :- A1 is A + X, suma(L, A1, S).
+
+% dla jakiej trójki argumentów zachodzi suma(X, Y, Z)?
+% suma([3,1,2], 50, ??) ?? to 56 deklaratywne znaczenie predykatu suma(...) trójargumentowego
+% S jejst sumą elementów listy L, jeśli S jest sumą elementów listy L i 0
+
+% długość(+L, ?K)
+% nieogonowo
+dlugosc([], 0).
+dlugosc([_|L], K) :- dlugosc(L, K0), K is K0 + 1.
+
+% istnieje predykat length, tak samo działający
+
+% ogonowo
+dlugosc_list(L, K) ;- dlugosc_listy(L, 0, K).
+dlugosc_listy([], K, K).
+dlugosc_listy([_ | L], A, K) :- A1 is A + 1, dlugosc_listy(L, A1, K).
+
+% dlugsoc_list -> pelna nazwa
+% dlugosc(L, 5) SLD nieskończone
+% standardowy lenfth daje jednokrotny sukces - drzewo skońćzone
+
+% dlaczego nasze z pierwszym nieustalonym nie sprawuje się?
+% length rozpoznaje, z jakim stopniem ukonkertnienia został wywołany
+% var(X) -- true, jeśli X nieustalone
+
+% predykat lista o długości: ustalonadługość K, uzgadnia] drugi argumetn z listą o długości takiej, jak pierwszy argument
+% lodl(+K, ?L)
+% lista_o_dlugosci 
+lodl(0, []).
+% PĘTLI SIĘ: lodl(K, [_ | L]) :- K1 is K - 1, lodl(K1, L).
+% wciąż zapętlenie, ponieważ zawsze możemy rekurencyną klauzulę możemy wybrać
+% kiedy nie powinniśmy jej wybrać?
+% jeśli K większe od zera - wtedy powinniśmy zastosować; dopiszemy warunek do klauzuli
+lodl(K, [_ | L]) :- K > 0, K1 is K - 1, lodl(K1, L).
+
+% wersja z var
+dlugosc(L, K) :- nonvar(K), lodl(K, L).
+dlugosc(L, K) :- var(K), dluosc_listy(L, L).
+
+% teraz działa jak length
+% uniwersalny predykat, uniwersanie trzeba sprawdzić ręcznie - spradzamy, z kßórym pobrlmem walczymy i decydujemy, które rozwiązanie
+
+% swojskiego var(...) stwrzymy, jesli wprawdzimy przecięcie
+
+% min(L, M)
+% sukces wtw., jeśli argumentem lista niepusata
+% nieogonowo
+minng([X], X]).
+minng([X | L], M) :- minng(L, M0), min(X, M0, M).
+% potrzebujemy predykatu min trójargumentowego, który liczy wartość minimalną z dwóch i uzgadnia z trzecim
+min(A, B, A) :- A<B.
+min(A, B, B) :- A>= B.
+
+% wersja ogonowa
+
+% min(L, M)
+min([X | L], M) :- min_pomoc(L, X, M).
+min_pomoc([], M, M).
+min_pomoc([X | L], A, M) :- min(X, A, A1), min_pomoc(L, A1, M).
+
+% zwróć uwagę na predykat min - minimum z dwóch liczb; pozostanie pnunkt nawrotu, który pogarsza efektywność programu
+% odcięcie zastosuemy - usuwamy punkt nawroty; akceptjmey wybór aktualnej klauzuli i usuwamy punkt nawrotu
+
+min(A, B, A) :- A<B, !.
+min(A, B, B) :- A>= B.
+
+% wykrzyknik to odcięcie; nic wspólnego z negacją
+% odcięcie jest prawdą - można zadać zapytanie
+/*
+ŹLE: myślimy, że po wybraiu pierwszej odcięcie zatryzma, natomaist jeśli pierwsza niespełniona - musi być druga
+niekiedy miin udzieli błędnje odpowiedzi
+możliwy wybór drugiej kklauzuli w chiwli, kiedy A < B
+odcięcie w treści klauzuli, trzeba najpierw wybrać kauzulę, trzeba uzgodnić atom z nagłówkiem klauzuli
+jeśli przekażemy jako trzeci argument wartość ustaloną
+przekaż na trzecim argumencie cos innego, niż na pierwszym
+dobrze: drga klauzula potwierdza słuszność
+min(A, B, A) :- A<B, !.
+min(A, B, B).
+*/
+
+% należy uważać na odcięcie, nie intepretować naiwnie, proceduralnie
+% ocięcie powinno być stosowane do poprawy efektywności programu, o którym juz wiemy, że jest poprawny
+% odcięcie zielone - odcięceie, które nie zmienai znaczenia proramu; po suunięciu ptgram działa tak samo
+% w noramlnych okolciznościach - odcięcia zielone sa dobre; stylistycznie właściwe
+% odcięcie czerwone
+% nie używamy odcięć czerwonych (raczej)
+% pisząc definicję musimy zagwarantować, że predykat będzie działać tak samo dobrze po usunięciu odcięcia
+% dodanie wykrzyknika nie zmienia, że napisalusmy błędną defeinicję
+% odcięcie to jedynie OPTYMALIZACJA - optymalizacja to JEDYNE własciwe
+% powoduje odcięciei fragmentów SLD drzewa - fragmentów, o któ©ych wiemy, że zbędne, gdyż bez żadnego sukcesu
+
+% moj var - uzgandnianie dwóch różnych ,,dziwnych" rzeczy
+% jednak Arti wycofał się z zadania :c
+
+
+% odwroc(+L, ?R). oba ustalone lub drugi nieustalony
+% nieogonowo
+odwrocng([], []).
+odwrocn([X | L], R) :- odwrocng(L, R0), append(R0, [X], R).
+
+% na każdy element listy doklejamy na koniec - kwadratowo
+% append jst zaimplementowany tak, jak scal - liniowy wzglęðem długości listy będącej pierwszym argumentem
+
+
+% ogonowo
+odwroc(L, R) :- odwroc(L, [], R).
+odwroc([], R, R).
+odwroc([X| L], A, R) :- odwroc(L, [X|A], R).
+% liniowy koszt - tyle uzgodnień
+% niektóre rozwiązania w prologu - ten sm schemat, co w haskellu
+
+% palindrom(Slowo)
+palindrom(Slowo) :- odwroc(Slowo, Slowo).
+
+
+% odwrocng drzewo nie jest skończone; wybór dla R - gałąź (tragedia), jeśli w drugiej części wywołamy z parą argumentóœ nieustalonych
+% da odpowiedź, później pętli się
+% w odwroc również nieskończone
