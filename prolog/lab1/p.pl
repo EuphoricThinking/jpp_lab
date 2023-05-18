@@ -540,3 +540,134 @@ palindrom(Slowo) :- odwroc(Slowo, Slowo).
 % odwrocng drzewo nie jest skończone; wybór dla R - gałąź (tragedia), jeśli w drugiej części wywołamy z parą argumentóœ nieustalonych
 % da odpowiedź, później pętli się
 % w odwroc również nieskończone
+
+
+% var próbujemmy uzgdoić arguemtn ze stałą Ala i stałą kot
+% jeśli oba zakońćzone powodzeniem - jest zmienną
+% wykorzystamy odcięcie *.*
+
+nie_ala(ala) :- !, fail.
+% fail standardowy predykat, ktory zawsze odnosi porażkę
+nie_ala(_).
+% nie ala sprawda, czy argument nie uzgadnia się ze stałą ala
+% efekt ywkrzyknika możemy poróœnać do negacji
+% negację ala(...) implementuje nie_ala(...)
+
+nie_kot(kot) :- !, fail.
+nie_kot(_).
+
+moj_var(X) :- nie_ala(X), !, fail. % ni uzgadnia się: odcięciem usuwamy resztę, jeśli nie uzgadnia się
+% nie_ala odniosło porażkę i NIE doszło do odcięcia, próbuemy dopasować z kotem
+moj_var(X) :- nie_kot(X), !, fail.
+% ani jedno, ani drugie
+moj_var(_).
+
+
+% kot i ala to stałe (zmienne wieką literą zapisywane). Uniwersum Herbtandta. Wiemy, ze kot i ala to stałe, ale nie wiemy, CZYM są
+% w prologu definiujemy PREDYKATY, żadnych zmiennych czy stałych
+
+% definicje nie_ala i nie_kot bardzo podobne, możemy połączyć w jedną
+
+% nie(X) % da sukces, jeśli prób udowodnienia atomu zakończy się porażką
+
+nie(X) :- X, !, fail.
+nie(_).
+
+mojvar2(X) :- nie(X = ala), !, fail.
+mojvar2(X) :- nie(X = kot), !, fail.
+mojvar2(_).
+
+% nie p©óbuje udowodnić X
+% dowód X odniesie sukces - ucinamy klauzulę, po czym generujemy oprażkę
+% za pomocą odcięćia zdefiniowaliiśmy negację
+% \+ negacja w prologu -> dziwny znaczek
+
+% to jest alternatywa (niezalecana)
+
+% alterantywa; dopsuje pierwsze nie(X) do ali, alternatywa prawdziwa, do nie(x) przechodzi sukces
+mojvar3(X) :- nie(nie(X=ala); nie(X = kot)).
+% mojvar3 odniesie sukces, jeśli odniesie porażkę proba uzgodnienia z X z ala lub próba uzgodnienia X z kot
+% nie(X) sprawdza, czy X można udowodnić
+% swi not albo \+
+
+mojvar4 :- nie(nie(X = ala)), nie(nie(X = kot)).
+
+% nie działa:
+mojvar_zle(X) :- X=ala, X=kot. % zawsze odnosi porażkę
+
+% srawdzi, czy argument jest listą stałych? 
+% na siłę: policz, ile sztuk A, poilciz, ile sztuk B
+% bez arytmetyki, ponieważ wówczas prostszy
+
+% reprezentacja liczby jako lista
+% akumuluje stałe a
+slowo(Slowo) :- slowo(Slowo, []).
+slowo([a | L], A) :- slowo(L, [a | A]).
+% slowo([b | L], A) :- rowna_dlugosc([b | L], A).
+slowo([b | L], A) :- rowna_dlab([b | L], A).
+
+rowna_dlugosc([], []).
+rowna_dlugosc([ _ | L], [b | K]) :- rowna_dlugosc(L, K).
+% z _ zamiast b przechodziły testy aaaba np.
+rowna_dlab([], []).
+rowna_dlab([a | L], [b | K]) :- rowna_dlab(L, K).
+
+
+% złożonosć w prologu liczymy, stierdzając, ile jest uzgodnień
+slowo2(Slowo) :- slowo2(Slowo, []).
+slowo2([a | L], A) :- slowo2(L, [b | A]).
+%slowo2([b | L], A) :- [b | L] = A.
+slowo2([b | L], [b | L]). %uzgadniamy
+
+% slowor(Zdanie, Reszta) sukces, jeśli a^nb^n opłączone z Resztą; Zdanie = Słowo*Reszta
+slowor([a|L], A) :- slowor(L, [b|A]).
+slowor([a, b | L], L). % Co najmniej jedno a, b
+
+slowor2([a, a|L], A) :- slowor2([a|L], [b|A]).
+slowor2([a, b | L], L). % Co najmniej jedno a, b
+
+slowo_akbkanbn(L) :- slowo_reszta(L, L1), slowo_reszta(L1, []).
+% mozna również słowo zamiast durgiego
+% slowor := slowo_reszta
+% Jak myślec o działnu?
+% otzyamlismy wjeści,e które chcemy sprasować
+% w wywołujemy slowo_reeszta, jeśli poprwany perefiks - uzgadnia drugi arguemnt z tym, co za tym prefiksem
+% parsowanie analizy składniwej, omnada state - skojarzenie
+% pierwszy argument to wejście, drugi - wyjście w slow_allah_akbar
+% monada: wejście jako argument, wyikiem - wyjście?
+
+% bardzo łądne parsery w prologu
+% notacaja dcg
+
+% quick sort
+% partiotn otrzymuje listę licz, otrzymuje liczbę, ponwinein uzgodnić rzeci arguemt zl listą elemntów listy l, która 
+part(+L, +P, -M, -D).
+partition([], _, [], []).
+part([X | L], P, [X| M], D) :- X < P, !, part(L, P, M D). % wczęsniej bez !
+part([X | L], P, M, [X|D]) :- X >= P, part(L, P. M, D).
+% istnieje punkt nawrotu
+
+% przed dodaniem odcięcia chciało szuakć dlaje
+% odcięcie można zastąpić ładniejszym mechanizmiem, który  ostatecznie sprowadz a się do zstosowania odcięcia 
+% if w prologu istnieje
+partition2([], _, [], []).
+part2([X | L], P, M1, D1) :-
+  (
+  X < P
+    ->
+  M1 = [X | M],
+  D1 = D
+  ;
+  M1 = M,
+  D1 = [X | D]
+  ),
+ part2(L,P.M,).
+
+  part(L, P, M D). % wczęsniej bez !
+part2([X | L], P, M, [X|D]) :- X >= P, part(L, P. M, D).
+
+
+mininaczej(A, B, C) :- A < B -> C = A; C = B.
+% jeśli A < B odniesie suckes, trzeba dowieść C=A, wpp. dowiedź C = B
+
+% Lepszy styl programowania, jeślil zastąpimy odcięcie ifem strzałeczka i średnik - if else
