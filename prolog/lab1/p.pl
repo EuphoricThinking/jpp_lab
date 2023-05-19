@@ -671,3 +671,182 @@ mininaczej(A, B, C) :- A < B -> C = A; C = B.
 % jeśli A < B odniesie suckes, trzeba dowieść C=A, wpp. dowiedź C = B
 
 % Lepszy styl programowania, jeślil zastąpimy odcięcie ifem strzałeczka i średnik - if else
+
+
+% przechodzimy dwukrotnie na razie
+% quicksort
+qs([], []).
+qs([X | L], S) :-
+  part(L, X, M, D),
+  qs(M, MS),
+  qs(D, DS),
+  append(MS, [X | DS], S).
+
+% wcześniej: qs naiwnie, teraz lepiej
+% pomocniczy predykat: sortuje listę i dokleja na koniec?
+
+qs2(L, S) :- qs2(L, [], S).
+qs2([], A, A).
+% trzeci argument - akumulator
+% akumulator sugeuje liniowe przejście, le nie w przypadku qs
+qs2([X | L], A, S) :-
+  part(L, X, M, D),
+  qs2(D, A, DAS), % te dwa atomy (dwa qs2) można zamienić miejscami
+  qs2(M, [X | DAS], S).
+% z s uzgadnainy wynik sortowamnia małych, potem X, potem wynik srtowania dużych, póxniej A - łczymy bez append terz
+% od końccca bardziej naturalnie
+
+% pesymistyczny czasowy qs: n^2
+% pamięciowo potrzebujmey liniowo: piersze nieogonwe wywołanie reukurencyjne otrzyma do sorowwnia listę tylko o jede krótszą niż argument aktualneog qs
+% spowoduje niogonowe wywołanie dla (n-1) elementowej listy
+
+% sortowanie możemy zacząć od tych, których jest nie więcej?
+% ile maksymalnie w tej częśi, w któ©ej nie więcej -> maksymalnie n/2 elementy do posortowania
+% koszt pamięciowy takiego qs logarytmiczny wzglęðem długości sortowanej listy; logarytmiczny w przypadku pesymistycznym; jesli równo na dwie części (pechowo) - logarytmiczzne
+% im bardiej nieróœno rozrzucą się, tym mniej pamięci pomocniczej potrzebujemy
+% złożoność pamięciowa jest stała, pesymistycznie jest logarytmiczna
+
+% na siłę, lepiej - policzymy najpierw długości
+
+qs3(L, S) :- qs3(L, [], S).
+qs3([], A, A).
+qs3([X | L], A, S) :-
+  part(L, X, M, D),
+  length(M, MN),
+  length(D, DN),
+  (
+    MN < DN
+  ->
+   qs3(M, [X | DAS], S),
+  qs3(D, A, DAS)
+  ;
+% pairtition buduje listy M i D, póxniej ponownie przechodzimy przy lenght - można nowe partition
+  
+  qs3(D, A, DAS), % te dwa atomy (dwa qs2) można zamienić miejscami
+  qs3(M, [X | DAS], S).
+
+
+part2(L, X, M, D, MN, DN) :- part2(L, X, M, D, 0, 0, MN, DN).
+part2([], _, [], [], A, B, A, B).
+part2([X | L], P, M1, D1, A, B, MN, DN) :-
+  (
+   X < P
+  ->
+  M1 = [X | M],
+  D1 = D,
+  A1 is A + 1,
+  B1 = B
+  ;
+  M1 = M,
+  D1 = [X | D],
+  A1 = A,
+  B1 is B + 1
+),
+part2(L, P, M, D, A1, B1, MN, DN).
+% chcemy zachować ogonowość - akumulator
+
+qs4(L, S) :- qs4(L, [], S).
+qs4([], A, A).
+qs4([X | L], A, S) :-
+  part(L, X, M, D),
+  length(M, MN),
+  length(D, DN),
+  (
+    MN < DN
+  ->
+   qs4(M, [X | DAS], S),
+  qs4(D, A, DAS) 
+  ;
+% pairtition buduje listy M i D, póxniej ponownie przechodzimy przy lenght - można nowe partition
+  
+  qs4(D, A, DAS), % te dwa atomy (dwa qs2) można zamienić miejscami
+  qs4(M, [X | DAS], S).
+
+% zadzal - plik o wczytywaniu argumentów
+% baza danych w reprezentacji klauzulowej, to nie ciąg termów do wczyrrania, tylko definicja preyktu trasa, którą należy wczytać
+% [lab7].
+% powyżej przedstawione wczytywanie predykatów
+% termowe czy klauzulowe wczytanie - innaczej przedstawia się rozwiązanie
+
+% univ jednopoziomowa dekompozycja argumentu =..
+% 2+3*4=..L
+% L = [+, 2, 3*4]
+% f(1,2,g(3),4)=..L
+% L = [f, 1,2,g(3),4]
+% univ zastępuje functot i arg (można zastąpić nim)
+% arność - ile elementów (w funktorze? głwnym elementcie? predyakcie? to, co w nawiasie f(1,2,3)
+
+% GRAFY potrzebne w ZALICZENIOWYM
+% w zadaniu otrzymujemy opis grafy; zapytania wymagające wyszukiwania ściezki w grafie
+
+% termowa reprezentacja: graf skierowany z anonimowymi krawędziami; reprezentacją grafu może być lista termów w postaci krawędź; jśli istnieje krawędź pomieðzo dwoma wierzchołkami
+
+graf1([kr(a,b), kr(a,c), kr(c,d), kr(a,d)]).
+% mamy graf
+% jśli będzimey skorzystać z grafu, wykonac obliczenie
+% graf1(G). uzgodni
+5 możemy zdefinoiwać dane, na których będziemy działali
+% uzadnainie argumentu z termowa reprezentacją
+
+% reprezentacja klauzulowa: definicja skłąda się z klauzuli unarnej dla każdej krawędzi w naszym grafie
+% klauzulowa reprezentacja tego sameog grafu:
+
+edge1(a,b).
+edge1(a,c).
+edge1(c,d).
+edge1(a,d).
+
+% graf1(G), member(kr(a, X), G). -> informacja, że b, c oraz d są sąsiadami wierzchołka
+
+% edge1(b, X). - otrzymujemy sąsiadóœ wierzchołka b
+% edgev - kod jest prostszy oraz bardziej efektywny
+% member - koszt linoiwy względem rozmiaru listy grafu
+% znalezienie sąsiada w reprezentacji klauzulowej ma koszt STAŁY, ponieważ interpreter prologu reprezentuje program nie w posaci listy klauzul, tylko używa brdziej złożonej strukutry dancyh (do tego optymalizacje)
+% mechanizm indeksacjji klauzul: struktura dancyhnprzechowująca program nei jest listą wszystkich klauuzl; dla każdego predykatu słownik, w ktrym kluczem jest pierwszy argument w nagłówku kluzuli
+% stały koszt, poniweaż haszowanie w słowniku
+% zasada programowania w prologu: indeksacja klauzul w porlogu jest ważna
+% decydując o wyborze kolejności agmentów w definowanych predykatach, staramy się umieścić jakopierwszy ten, który umożliwi najbardziej efektywnie wybrać klauzulę
+% program mozę dodawać klauzule assert oraz usuwać za pmocą retract NIE WOLNO KORZYSTAĆ Z TEGO
+% mechanizm samomodyfikacji programoœ jest zbyt potężny, :< żebyśmy na koniec korzystali z niego
+% retract zmienne globalne? możliwe przypisanie; krok w stornę pogramowani proceduralnego
+
+
+% klika klauzulowo:
+wezel2(X) :- member(X, [a,b,c,d,e]).
+edge2(X, Y) :- wezel2(X), wezel2(Y), X \= Y.
+
+% zapis algorytmu stwierdzającego, czy do grafu należy krawędź jest już jego implementacją
+% nie zawsze przeszkadzają nam ograniczenia reprezentacji klauzulowej
+
+% ścieżka łącząca wierzchołek A z wierzchołkiem B
+connect(A, B) :- edge1(A, B).
+% bez connect A, A - co najmniej jedna krawędź
+% ŹLE:
+connect(A, B) :- connect(A, C), connect(C,B).
+% problem z pierwszych zajęć: przodek. Nie działa, ponieważ pętli się - bezwarunkowo wywołuje siebie rekurencyjnie
+% lepiej (zapętli się przy cyklicznym, al epracujemy na acyklicnym)
+connect(A, B) :- edge1(A, C), connect(C,B).
+
+% wcześniej w reprezentacji klauzulowej; teraz termowa
+connect(G, A, B) :- member(kr(A, B), G).
+connect(G, A, B) :- member(kr(A, C), G), connect(G, C, B).
+
+% źleeeee cyklicn cykliczny graf zapisz
+edge1(a,c).
+edge1(a,c).
+edge1(c,d).
+edge1(a,d).
+
+
+
+% łatwo, ponieważ założyliśmy acykliczność
+% gdyby cykliczne - zapętliłyby się
+% jak rozwiązać problem zapętlenia?
+
+path(A, B, [A, B]) :- edge1(A, B).
+path(A, B, [A | P]) :- edge1(A, C), path(C,B,P).
+
+% okazja do negacji, by sprawdzić, czy już odwiedziliśmy dany wierzchołek
+path_c(A, B, P) :- path_c(A,B,[],P).
+path_c(A, B, _, [A, B]) :- edge1(A, B).
+path_c(A, B, V, [A | P]) :- edge1(A, C), \+member(C, V), path_c(C,B, [A|V], P).
