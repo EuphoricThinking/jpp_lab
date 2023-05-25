@@ -848,5 +848,141 @@ path(A, B, [A | P]) :- edge1(A, C), path(C,B,P).
 
 % okazja do negacji, by sprawdzić, czy już odwiedziliśmy dany wierzchołek
 path_c(A, B, P) :- path_c(A,B,[],P).
-path_c(A, B, _, [A, B]) :- edge1(A, B).
-path_c(A, B, V, [A | P]) :- edge1(A, C), \+member(C, V), path_c(C,B, [A|V], P).
+path_c(A, B, _, [A, B]) :- edge1(A, B). % edge2
+path_c(A, B, V, [A | P]) :- edge1(A, C), \+member(C, V), path_c(C,B, [A|V], P). % edge2
+
+% znaleźć cykle Eulera
+% jak rozwiązać problem? która reprezentacja na pasuje
+% porażka - jeśli brak ścieżki
+% wielokrotny sukces dla każdej znalezionej ścieżki
+% prolog - wiele zastosowań predykatów
+% sprawdzenie, czy byt spełnia dany warunek, może posłużyć do wygenerowania tego bytu
+% w pełni ustalone zapytania
+
+% reprezentacja grafu - klauzulowa
+% lista - sprawdzay, czy każda para elementów w liście to wierzchołki połączone krawędzią?
+% sprawdzic ponadto, czy istniają wierzchołki poza znalezioną ścieżką
+
+% bardzo na siłę: reprezentacja klauzulowao
+
+edge3(a, b).
+edge3(b,c).
+edge3(c,a).
+edge3(c,d).
+edge3(b,e).
+edge3(e,c).
+
+% path_c stwirzyliśmy dla edge2, trzeba porawić
+edge(3,a, b).
+edge(3,b,c).
+edge(3,c,a).
+edge(3,c,d).
+edge(3.b,e).
+edge(3.e,c).
+
+% Euler - czy lista jest ścieżką eulera w grafie sprawdzamy
+path(G, A, B, [A, B]) :- edge(G, A, B).
+path(G, A, B, [A | P]) :- edge1(G, A, C), path(G, C,B,P).
+
+% okazja do negacji, by sprawdzić, czy już odwiedziliśmy dany wierzchołek
+% NOWE
+path_c(G, A, B, P) :- path_c(G, A,B,[],P).
+path_c(G, A, B, _, [A, B]) :- edge(G, A, B). % edge2
+path_c(G, A, B, V, [A | P]) :- edge(G, A, C), \+member(C, V), path_c(G, C,B, [A|V], P). % edge2
+
+
+% wszystkie - odniesie sukces, jeśli wszystkie krawędzie grafu są na ścieżce P
+euler(G, P) :- path_c(G, _,_,P), wszystkie(G,P).
+% może łatwiej sprawdzić, że nie istnieje krawędź na ścieżce
+wszystkie(G, P) :- \+nie_wszystkie(G, P).
+nie_wszystkie(G, P) :- edge(G, A, B), \+sasiaduja(A, B, P). 
+% sasiaduja ze soba na liscie
+sasiaduja(A, B, P) :- append(_, [A, B | _], P). % sukce s w append, jśli P jest sklejeniem pierwszej i drugije listy	
+% ostrzeżenie - nie sąsiadują ze sobą w pliku klauzule
+
+% path_c nie można ponownie wejść do wierzchoła w początkowej definicji, dlatego nie dizała ab, bc, ca, bd
+% gdy P jest ścieżką w grafie G; musimy uważać na zapętlenie
+% trzymamy listę wykorzystanych krawędzi zamiast wierzchołków
+path_C(G, P) :- path_c(G, [], P).
+% w od wykorzystane
+path_c(G, W, [A, B]) :- edge(G, A, B), \+member(kr(A, B), W). % nieprawda, że dana krawędź wśród wykorzystanych
+path_c(G, W, [A, B | P]) :-
+  edge(G, A, B), 
+  \+member(kr(A, B), W),
+  path_c(G, [kr(A,B)] | W], [B|P]). % poprzednia wersja: samo P, wówczas zaczynało od początku szukać
+% różna arność - bez konfliktu z poprzednim path_c
+
+% euler generuje wszystkie ściezkim następnie sprawdza, czy ścieżka jest dobra
+% negacja pozwala zrealizować pętlę
+% zamieniamy (dla każdego y Alfa(y) => nieprawda, że istnieje y, tż. nieprawda, że Alpha(y))
+
+% terazu euler termowy
+% możemy w przypadu termowej na bieżąco modyfikować graf (mamy zabronione predykaty, np. assert
+% możemy zmniejszać graf - jeśli skorzystaliśmy z krawędzi - wyjmujemy z grafu
+euler_t([kr(A, B), [A,B]).
+euler_t(G, [A, B|P]) :- wyjmij(G, kr(A,B), G1), euler_t(G1, [B | P]).
+% wyjiimij da sukcejs, jeśli coś tam + lista K powstaje przez usunuęcie X  z L
+
+wyjmij([X | L], X, L).
+wyjmij([X|L], Y, [X|K]) :- wyjmij(L, Y, K).
+
+graf([kr(1,b), kr(b,c), kr(c,a), kr(d,e), kr(e,c), kr(b,e)]).
+
+% drzewo: lewe poddrzewo, wartość w korzeniu, prawe poddrzewo
+
+% przykład drzewa
+p_drzewa(1, wezel(wezel(puste, 1, puste), 2, wezel(puste,3,puste))).
+
+drzewo(puste).
+drzewo(wezel(D1, _, D2) :- drzewo(D1), drzewo(D2).
+
+% insert_bst(+D, +X, -D1).
+insert_bst(puste, X, wezel(puste, X, puste)).
+insert_bst(wezel(L, Y, P), X, wezel(L1, Y, P) :-
+  X <= Y,
+  !, % odcięcie - akceptujey wybór tej klauzuli
+  insert_bst(L, X, L1).
+insert_bst(wezel(L, Y, P), X, wezel(L, Y, P1) :-
+  X > Y,
+  insert_bst(P, X, P1). 
+
+% wywolanie: p_drzewa(1, D), insert_bst(D, 3, D1). % dodane cztery zamiawst 3 w definicji p_drzewa - odyfikacja p_drzewa
+
+% z ifem:
+insert_bst_if(puste, X, wezel(puste, X, puste)).
+insert_bst_if(wezel(L, Y, P), X, wezel(L1, Y, P1) :-
+  (
+  X <= Y,
+  ->
+   P = P1, % zugadniamy P z P1; prawe poddrzewo bez zmian
+  insert_bst_if(L, X, L1).
+  ;
+   L = L1,
+   insert_bst_if(P, X, P1).
+).
+
+% zmienna pomocnicza M od modyfikowane
+% inaczej:
+insert_bst_if_M(puste, X, wezel(puste, X, puste)).
+insert_bst_if_M(wezel(L, Y, P), X, wezel(L1, Y, P1) :-
+  (
+  X <= Y,
+  ->   
+   P = P1, % zugadniamy P z P1; prawe poddrzewo bez zmian
+  M = L,
+  M1=L1,
+  ;
+   L = L1,
+   M = P,
+   M1 = P1
+  ),
+   insert_bst_if_m(M, X, M1).
+% usuwamy przejście rekurencyjne
+
+
+% brzydkie - nieładny koszt wykonania
+wypisz_bst(puste, []).
+wypisz_bst(wezel(L, X, P), K) :-
+  wypisz_bst(L, K1),
+  wypisz_bst(P, K2),
+  append(K1, [X|K2], K).
