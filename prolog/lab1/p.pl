@@ -986,3 +986,191 @@ wypisz_bst(wezel(L, X, P), K) :-
   wypisz_bst(L, K1),
   wypisz_bst(P, K2),
   append(K1, [X|K2], K).
+
+
+wypisz_drzewo(D, L) :- wypisz_drzzewo(D, [], L).
+wypisz_drzewo(puste,A,A).
+wpypisz_drzew(wezel(L,X,P), A, K) :-
+  wypisz_drzewo(P, A, A1),
+  wypisz_drzewo(L, [X|A1], K).
+
+% wywołanie
+% przykal_drzewa(D), wypisz_drzewo(D, L).
+
+% nieogonwo - od_konca sufiks
+lista_na_drzewo([], puste).
+lista_na_drzewo([X | L], D) :-
+  lista_na_drzewo(L, D0),
+  insert_bst(D0, X, D).
+
+% dlaczgo w najwyższym węźle ostatni element? najpierw zajmujemy się ogonem, póxniej - głową
+
+
+% dodatkowy argument bez sufiksu
+% wszystkie elementy listy będące pierwszym aguemtnem uzgadniamy z trzecim argumentem?
+lista_na_drzewo(L, D) :- lista_na_drzewo(L, puste, D).
+lista_na_drzewo([], D, D).
+lista_na_drzewo([X|L], A, D) :-
+  insert_st(A, X, A1),
+  lista_na_drzewo(L, A1, D).
+
+sort_bst(L, S) :- lista_na_drzewo(L, D), drzewo_na_liste(D, S).
+
+
+makefile na moodle nmby
+
+PL = sicstus
+SPLD = spld
+SPLDFLAGS = --static --exechome=/opt/sicstus/bin/
+
+% plik wykonywalny
+mojProgram: mojProgram.sav
+<-->$(
+
+% mamy plik kompilacja
+%  po każdym poleceniu - kropka
+% punkt startowy
+user:runntime_entry(start):-
+(
+% dczytujemy argumenty
+current_prolog_flag(argv, [File])
+->
+  % wyłączamy zglaszanie wyjątoów w przypadku błedów wejścia-wyjścia
+set_prolog_(fileerrors, off),
+(
+% wczytujemy bazę danych
+compile(File)
+-> true
+;
+format('Error ~p.\n`, [File])
+),
+prompt(_Old, ''),
+przetwarzaj
+;
+write('costam')
+).
+
+przetwarzaj :-
+read(Start),
+read(Meta),
+
+
+% compile ładuje wersję klauzulową z pliku
+
+
+
+% wacamy do drzew
+
+% drzewa niepuste - chcemy wyróżnić, które mają tylko jeden węzeł
+% liscie(+D, ?L)
+liscie(D, L) :- liscie(D, [], L).
+liscie(puste, A, A).
+liscie(wezel(puste, X, puste), A, [X|A]).
+liscie(wezel(L, _, P), A, W) :-
+  % lisita wynikowa W
+  liscie(P, A, A1),
+  liscie(L, A1, W).
+
+% nie powinein pozwalać na wciśnięcie średnika; średnik - chce więcej sukcesów, czyli predykat nie jest deterministyczny
+% powinien by,ć jednokrotnysukceso
+% możemy wybrać trzecią klauzulę, chociaż mamy do czyniena z drzewem z jednym węzłem
+
+trasa
+% suskces uzgodni km z długością trasy
+
+% w pliku kompilacja polecenia, które przekazujemy
+% popraw na;
+% PRAWIDŁOWO - JEDNA ODPOWIEDŹ
+% liscie(wezel(puste, X, puste), A, [X|A]) :- !.
+
+% znak zapytania wskazuje, że oczekujemy poprawnej odpowiedzi również w sytuacji, kiedy drugi arguemnt ustalony
+% ustalenie trzeciego argumetnu uniemożliwiło uzgodnieni dowodzonego atomu z nagłówkiem klauzuli, pomimo żena pierwszymargumencie drzewo z jednym węzłem, czyli nie zrobilismy odcięcia i przekazaliśmy następną klauzulę, chociaż przekazane drzewo ma jeden węzeł
+% udziela błeðnej odpowiedzi, jeśli sprawdza poprawność
+% brakuje w treści klauzuli warunku
+% powinni smy dopisać test, który odniesie sukces, jeśli drzewo na pierwszym argumencei ma więcej niż jeden węzeł
+liscie(D, L) :- liscie(D, [], L).
+liscie(puste, A, A).
+liscie(wezel(puste, X, puste), A, [X|A]) :- !.
+liscie(wezel(L, _, P), A, W) :-
+(
+  L \= puste
+;
+  P \= puste  % L ani P nie uzgadniają się z oustym
+),
+% mamy alternatywę, która prowadzi do podwójnego sukcesu
+  % lisita wynikowa W
+  liscie(P, A, A1),
+  liscie(L, A1, W).
+
+
+% inaczej
+liscie(D, L) :- liscie(D, [], L).
+liscie(puste, A, A).
+liscie(wezel(puste, X, puste), A, [X|A]) :- !.
+liscie(wezel(L, _, P), A, W) :-
+(L, P) \= (puste, puste),
+% równoważnie \+ ((L, P) = (puste, puste)),
+% mamy alternatywę, która prowadzi do podwójnego sukcesu
+  % lisita wynikowa W
+  liscie(P, A, A1),
+  liscie(L, A1, W).
+
+
+
+% do predykatu ewszerz potrzebujemy kolejki
+wszerz(D, L) :- wszerz_k([D], L).
+wszerz_k([], L).
+wszerz_k([puste | K], W) :- wszerz_k(K, W).
+wszerz_k([wezel(L, X, P) | K], [X|W]) :-
+ wstaw(L, K, K1),
+  wstaw(P, K1, K2),
+wszerz_k(K2, W).
+
+
+% lista różnicowa K=[1,2,3|L]-L, L=[4,5|M]-M.
+% K=[1,2,3|L]
+
+% wersja z kolejką - niedokończone
+wszerz(D, L) :-
+init(K),
+wstaw(K, D, K1),
+wszerz_k(K1, L).
+
+wszerz_k(K, []) :- pusta(K).
+
+wszerz_k(K, W) :- 
+  \+pusta(K).
+  pobierz(K, puste, K1),
+wszerz_k(K1, W).
+% każdy węzeł odiwedzamy raz - linowiy koszt obejścia drzewa
+
+% tutaj dokończyć - jednak chyba dokończone, ale SPRAWDŹ na następnych
+wszerz_k(K, [X|W]) :-
+\+pusta(K),
+pobierz(K, wezel(L,X,P), K1),
+wstaw(K1, L, K2),
+wstaw(K2,P,K3),
+wszerz_k(K3, W).
+
+init([]).
+pusta([]).
+wstaw(K, X, K1) :- append(K, [X], K1).
+pobierz([X|K], X, K).
+
+% ista różnicowa: para lista otwarta (kończąca się zmienną, ogonem jest zmeinna, nie ostatni elemnt), drugi element pary to zmeinna, czyli wskaźnik na ogon
+% init dla listy różnicowej
+% pusta lista otwarta: K
+
+
+init(L-L).
+pusta(L-_) :- var(L). % jeśli L jest zmienną - jest puste
+% przed minuesm to, co jest na liście, po minusue - to, czego brak na liście
+% buduje listę, w której brak X na końcu już nie występuje
+wstaw(K-[X|L], X, K-L).
+pobierz([X|K]-L, X, K-L). % pobieamy X, K-L jako rezultat
+
+
+% w algorytmie uzgadnainai: warunkeim umożiwiające uzgodnienie zmiennej z termem jest to, aby zmienna nie występowała w termie
+% unify_with_occurs_check(X, f(X)).
+% uzgadnianie w prologu NIEPOPROWNE
+% uzgodnienie tworzy cykliczną strukturę danych?w
